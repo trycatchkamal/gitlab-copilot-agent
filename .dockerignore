@@ -1,0 +1,48 @@
+# Dependencies (installed fresh in Docker)
+node_modules/
+
+# Build output (rebuilt in Docker)
+dist/
+
+# Logs
+*.log
+logs/
+
+# Runtime directories
+hooks/
+coverage/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed at runtime)
+README.md
+*.md
+!I18N_README.md
+
+# IDE
+.vscode/
+.idea/
+.claude/
+
+# Test files (not needed in production image)
+*.test.ts
+*.spec.ts
+__tests__/
+coverage/
+vitest.config.ts
+jest.config.*
+
+# Dev config (not needed at runtime)
+.prettierrc.cjs
+eslint.config.js
+
+# Explicitly include files needed for build
+!tsconfig.json
+!pnpm-lock.yaml

@@ -1,0 +1,34 @@
+당신은 기술 전달 리드 역할을 하는 GitHub Copilot CLI입니다.
+
+작업: 다음 GitLab issue를 분석하고 구체적인 엔지니어링 계획을 생성하세요.
+
+Issue 컨텍스트:
+- 제목: {issue_title}
+- IID: {issue_iid}
+- 프로젝트: {project_path}
+- URL: {issue_url}
+
+Issue 설명:
+{issue_description}
+
+중요: 현재 디렉토리에 'plan.json'이라는 이름의 파일에 응답을 직접 작성해야 합니다.
+파일 작성 기능을 사용하여 정확히 두 개의 키를 포함하는 유효한 JSON으로 이 파일을 생성하세요:
+1. "branch": kebab-case 브랜치 이름 (예: issue-{issue_iid}-add-login-feature)
+2. "todo_markdown": - [ ] 형식을 사용하는 실행 가능한 작업이 포함된 Markdown 체크리스트
+
+계획 요구사항:
+- issue를 구체적이고 테스트 가능한 단계로 분해
+- 해당되는 경우 특정 파일/컴포넌트 참조
+- 구현, 테스트 및 문서화 작업 포함
+- 작업을 집중적이고 원자적으로 유지
+- 명확하고 명령형 언어 사용
+
+plan.json에 작성할 예제 JSON 구조:
+```
+{
+  "branch": "issue-{issue_iid}-implement-feature",
+  "todo_markdown": "- [ ] Auth 모듈 생성\\n- [ ] 유닛 테스트 추가\\n- [ ] 문서 업데이트"
+}
+```
+
+구조화된 계획이 포함된 plan.json 파일을 작성하세요. 작업을 간단히 확인한 다음 파일을 생성할 수 있습니다.

@@ -1,0 +1,73 @@
+{
+  "name": "gitlab-copilot-agent",
+  "version": "1.0.0",
+  "description": "Lightweight GitLab webhook relay service that triggers CI/CD pipelines for copilot-gitlab-agent integration",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "mr-review": "tsx src/mr-review-cli.ts",
+    "issue-workflow": "tsx src/issue-workflow-cli.ts",
+    "mr-update": "tsx src/mr-update-cli.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "gitlab",
+    "webhook",
+    "copilot",
+    "ci-cd",
+    "fastify",
+    "typescript"
+  ],
+  "author": "trycatchkamal",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trycatchkamal/gitlab-copilot-agent.git"
+  },
+  "homepage": "https://github.com/trycatchkamal/gitlab-copilot-agent#readme",
+  "bugs": {
+    "url": "https://github.com/trycatchkamal/gitlab-copilot-agent/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@fastify/env": "^5.0.1",
+    "@gitbeaker/rest": "^43.8.0",
+    "@github/copilot-sdk": "^0.1.22",
+    "dotenv": "^16.4.5",
+    "fastify": "^5.2.0",
+    "p-queue": "^9.1.0",
+    "pino": "^9.5.0",
+    "pino-pretty": "^13.0.0",
+    "simple-git": "^3.30.0",
+    "strip-ansi": "^7.1.2",
+    "undici": "^7.2.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.2",
+    "@typescript-eslint/parser": "^8.18.2",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "jest": "^30.2.0",
+    "prettier": "^3.4.2",
+    "ts-jest": "^29.4.6",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.54.0"
+  }
+}

@@ -1,0 +1,129 @@
+variables:
+  NODE_VERSION: "20"
+  UPSTREAM_GITLAB_BASE_URL: "https://gitlab.com"
+
+stages:
+  - test
+  - build
+  - implement
+  - deploy
+
+# ============================================================
+# Common Templates
+# ============================================================
+
+.node_setup:
+  image: node:${NODE_VERSION}-alpine
+  before_script:
+    - npm install -g pnpm
+    - pnpm install --frozen-lockfile
+
+# ============================================================
+# Standard CI/CD Jobs (run on push/MR)
+# ============================================================
+
+test:
+  extends: .node_setup
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - pnpm typecheck
+    - pnpm lint
+    - pnpm test:coverage
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    paths:
+      - coverage/
+    expire_in: 1 week
+
+build:
+  extends: .node_setup
+  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG
+  script:
+    - pnpm build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+
+docker:build:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE:latest
+
+# ============================================================
+# Triggered Workflow Jobs (run when webhook relay triggers)
+# ============================================================
+
+issue_workflow:
+  extends: .node_setup
+  stage: implement
+  rules:
+    - if: $TRIGGER_TYPE == "issue_assignee"
+  script:
+    - echo "[INFO] Starting Issue Workflow"
+    - echo "[INFO] Issue Title - $ISSUE_TITLE"
+    - echo "[INFO] Issue IID - $TARGET_ISSUE_IID"
+    - pnpm run issue-workflow
+  artifacts:
+    paths:
+      - logs/
+    expire_in: 1 week
+    when: always
+
+mr_update:
+  extends: .node_setup
+  stage: implement
+  rules:
+    - if: $TRIGGER_TYPE == "mr_note"
+  script:
+    - echo "[INFO] Starting MR Update Workflow"
+    - echo "[INFO] MR IID - $TARGET_MR_IID"
+    - echo "[INFO] Instruction - $MR_NOTE_INSTRUCTION"
+    - pnpm run mr-update
+  artifacts:
+    paths:
+      - logs/
+    expire_in: 1 week
+    when: always
+
+mr_review:
+  extends: .node_setup
+  stage: implement
+  rules:
+    - if: $TRIGGER_TYPE == "mr_reviewer"
+  script:
+    - echo "[INFO] Starting MR Review Workflow"
+    - echo "[INFO] MR Title - $MR_TITLE"
+    - echo "[INFO] MR IID - $TARGET_MR_IID"
+    - |
+      if [ "${ENABLE_INLINE_REVIEW_COMMENTS:-false}" = "true" ]; then
+        echo "[INFO] Using inline comments mode"
+      else
+        echo "[INFO] Using general comments mode"
+      fi
+    - pnpm run mr-review
+  artifacts:
+    paths:
+      - logs/
+    expire_in: 1 week
+    when: always
